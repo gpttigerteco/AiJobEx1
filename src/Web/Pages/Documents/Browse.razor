@@ -1,0 +1,18 @@
+@page "documents/browse"
+@attribute [Authorize]
+
+<PageTitle>مرور مستندات</PageTitle>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">مستندات واحد من</h5>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <input type="search" class="form-control" placeholder="جستجو در مستندات" />
+        </div>
+        <div class="empty-state">
+            <p class="text-muted">هنوز مستندی اضافه نشده است.</p>
+        </div>
+    </div>
+</div>

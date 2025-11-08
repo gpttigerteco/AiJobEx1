@@ -1,0 +1,79 @@
+body {
+    font-family: 'Vazirmatn', 'IRANSans', sans-serif;
+    background-color: #f4f6f8;
+    color: #1f2937;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #1e3a8a, #1d4ed8);
+    color: #fff;
+    padding: 1rem;
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar .nav-link {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.content {
+    flex: 1;
+    padding: 2rem;
+    transition: margin-right 0.3s ease;
+}
+
+.layout-header {
+    margin-bottom: 1.5rem;
+}
+
+.chat-body {
+    min-height: 320px;
+    max-height: 480px;
+    overflow-y: auto;
+    background-color: #f9fafb;
+}
+
+.chat-message {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.chat-message.ai .message-body {
+    background-color: #e0f2fe;
+}
+
+.chat-message.user .message-body {
+    background-color: #f1f5f9;
+}
+
+.chat-message .message-body {
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+    flex: 1;
+}
+
+.markdown-preview {
+    white-space: pre-wrap;
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+}

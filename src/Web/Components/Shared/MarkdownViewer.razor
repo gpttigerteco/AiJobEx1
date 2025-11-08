@@ -1,0 +1,24 @@
+@if (!string.IsNullOrWhiteSpace(Content))
+{
+    <div class="markdown" @onclick="TogglePreview">
+        @if (showPreview)
+        {
+            <pre class="markdown-preview">@Content</pre>
+        }
+        else
+        {
+            <p class="text-muted">برای مشاهده پیش‌نمایش کلیک کنید.</p>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted">محتوایی برای نمایش وجود ندارد.</p>
+}
+
+@code {
+    [Parameter] public string? Content { get; set; }
+    private bool showPreview = true;
+
+    private void TogglePreview() => showPreview = !showPreview;
+}

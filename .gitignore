@@ -1,0 +1,16 @@
+bin/
+obj/
+*.user
+*.suo
+*.dbmdl
+*.jfm
+.vs/
+Logs/
+wwwroot/lib/
+.env
+.env.*
+*.swp
+*.swo
+/test-results/
+/TestResults/
+.nuget/

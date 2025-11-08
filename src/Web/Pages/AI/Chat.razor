@@ -1,0 +1,106 @@
+@page "/ai/chat"
+@attribute [Authorize]
+@implements IDisposable
+@using System.Text.Json
+@inject NavigationManager Navigation
+
+<PageTitle>چت سازمانی</PageTitle>
+
+<div class="chat-container card shadow-sm">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">دستیار هوشمند سازمانی</h5>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" @bind="requestCitations" id="requestCitations">
+            <label class="form-check-label" for="requestCitations">نمایش استنادها</label>
+        </div>
+    </div>
+    <div class="card-body chat-body">
+        @foreach (var message in messages)
+        {
+            <ChatMessage Message="@message.Text" IsAi="message.IsAi" Citations="message.Citations" />
+        }
+    </div>
+    <div class="card-footer">
+        <EditForm Model="request" OnValidSubmit="SendMessageAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="input-group">
+                <InputTextArea class="form-control" @bind-Value="request.Message" rows="2" placeholder="سوال خود را بنویسید..." />
+                <button class="btn btn-primary" type="submit" disabled="@isSending">
+                    @(isSending ? "در حال ارسال..." : "ارسال")
+                </button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private readonly List<ChatMessageModel> messages = new();
+    private bool requestCitations = true;
+    private bool isSending;
+    private HubConnection? hubConnection;
+
+    private readonly ChatRequest request = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/hubs/ai-chat"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        hubConnection.On<JsonElement>("ReceiveMessage", response =>
+        {
+            var answer = response.GetProperty("answer").GetString() ?? string.Empty;
+            var citations = new List<Citation>();
+            if (response.TryGetProperty("citations", out var citationsElement))
+            {
+                foreach (var citationElement in citationsElement.EnumerateArray())
+                {
+                    var type = citationElement.TryGetProperty("type", out var typeElement) ? typeElement.GetString() : null;
+                    var title = citationElement.TryGetProperty("title", out var titleElement) ? titleElement.GetString() : null;
+                    citations.Add(new Citation(type ?? string.Empty, null, title, null));
+                }
+            }
+
+            messages.Add(new ChatMessageModel(answer, true, citations));
+            InvokeAsync(StateHasChanged);
+        });
+
+        hubConnection.On<string>("ReceiveError", error =>
+        {
+            messages.Add(new ChatMessageModel($"خطا: {error}", true, Enumerable.Empty<Citation>()));
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task SendMessageAsync()
+    {
+        if (hubConnection is null || string.IsNullOrWhiteSpace(request.Message))
+        {
+            return;
+        }
+
+        isSending = true;
+        messages.Add(new ChatMessageModel(request.Message, false, Enumerable.Empty<Citation>()));
+        await hubConnection.SendAsync("SendMessage", request.Message, requestCitations);
+        request.Message = string.Empty;
+        isSending = false;
+    }
+
+    public void Dispose()
+    {
+        _ = hubConnection?.DisposeAsync();
+    }
+
+    private record ChatRequest
+    {
+        [Required]
+        [MaxLength(2000)]
+        public string Message { get; set; } = string.Empty;
+    }
+
+    private record ChatMessageModel(string Text, bool IsAi, IEnumerable<Citation> Citations);
+}

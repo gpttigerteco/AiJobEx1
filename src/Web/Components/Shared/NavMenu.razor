@@ -1,0 +1,26 @@
+<nav class="sidebar @(collapsed ? "collapsed" : string.Empty)">
+    <div class="sidebar-header">
+        <button class="btn btn-outline-light w-100" @onclick="Toggle">@(!collapsed ? "جمع کردن" : "باز کردن")</button>
+    </div>
+    <ul class="nav flex-column">
+        <li class="nav-item"><NavLink class="nav-link" href="/">داشبورد</NavLink></li>
+        <li class="nav-item"><NavLink class="nav-link" href="job/my">شرح وظایف من</NavLink></li>
+        <li class="nav-item"><NavLink class="nav-link" href="documents/browse">مستندات</NavLink></li>
+        <li class="nav-item"><NavLink class="nav-link" href="ai/chat">چت سازمانی</NavLink></li>
+        <li class="nav-item"><NavLink class="nav-link" href="admin/users">مدیریت کاربران</NavLink></li>
+    </ul>
+</nav>
+
+@code {
+    [Parameter] public EventCallback OnMenuToggled { get; set; }
+    private bool collapsed;
+
+    private async Task Toggle()
+    {
+        collapsed = !collapsed;
+        if (OnMenuToggled.HasDelegate)
+        {
+            await OnMenuToggled.InvokeAsync();
+        }
+    }
+}

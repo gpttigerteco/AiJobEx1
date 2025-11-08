@@ -1,0 +1,51 @@
+@page "job/requests"
+@attribute [Authorize]
+
+<PageTitle>پیشنهاد تغییر شرح وظایف</PageTitle>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">ارسال پیشنهاد جدید</h5>
+    </div>
+    <div class="card-body">
+        <EditForm Model="request" OnValidSubmit="SubmitAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label class="form-label">محتوای پیشنهادی</label>
+                <InputTextArea class="form-control" @bind-Value="request.Markdown" rows="8" />
+            </div>
+            <button class="btn btn-success" type="submit" disabled="@isSubmitting">
+                @(isSubmitting ? "در حال ارسال..." : "ثبت پیشنهاد")
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@if (toastMessage is not null)
+{
+    <div class="alert alert-info mt-3">@toastMessage</div>
+}
+
+@code {
+    private readonly ChangeRequestModel request = new();
+    private bool isSubmitting;
+    private string? toastMessage;
+
+    [Inject] private IMediator Mediator { get; set; } = default!;
+
+    private async Task SubmitAsync()
+    {
+        isSubmitting = true;
+        var result = await Mediator.Send(new RequestJobDescriptionChangeCommand(Guid.Empty, Guid.Empty, request.Markdown));
+        toastMessage = result.Succeeded ? "پیشنهاد شما ثبت شد" : result.Error;
+        isSubmitting = false;
+    }
+
+    private class ChangeRequestModel
+    {
+        [Required]
+        [MaxLength(20000)]
+        public string Markdown { get; set; } = string.Empty;
+    }
+}

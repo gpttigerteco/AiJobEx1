@@ -1,0 +1,23 @@
+<div class="chat-message @(IsAi ? "ai" : "user")">
+    <div class="avatar">
+        <i class="fa @(IsAi ? "fa-robot" : "fa-user")"></i>
+    </div>
+    <div class="message-body">
+        <p>@Message</p>
+        @if (Citations?.Any() == true)
+        {
+            <ul class="citations">
+                @foreach (var citation in Citations)
+                {
+                    <li>@citation.Title (@citation.Type)</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Message { get; set; } = string.Empty;
+    [Parameter] public bool IsAi { get; set; }
+    [Parameter] public IEnumerable<Citation>? Citations { get; set; }
+}

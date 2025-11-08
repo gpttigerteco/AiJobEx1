@@ -1,0 +1,27 @@
+@inherits LayoutComponentBase
+
+<div class="layout">
+    <NavMenu OnMenuToggled="ToggleSidebar" />
+    <div class="content" @(isSidebarCollapsed ? "collapsed" : string.Empty)>
+        <header class="layout-header d-flex justify-content-between align-items-center">
+            <div class="breadcrumb">@Breadcrumb</div>
+            <div class="header-actions">
+                <input type="search" class="form-control" placeholder="جستجو..." />
+            </div>
+        </header>
+        <main class="layout-body">
+            @Body
+        </main>
+    </div>
+</div>
+
+@code {
+    private bool isSidebarCollapsed;
+
+    public RenderFragment Breadcrumb { get; set; } = builder =>
+    {
+        builder.AddContent(0, "خانه");
+    };
+
+    private void ToggleSidebar() => isSidebarCollapsed = !isSidebarCollapsed;
+}
